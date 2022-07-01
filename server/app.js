@@ -4,7 +4,9 @@ const multer = require('multer');
 
 const app = express();
 const http = require('http').Server(app);
+const axios = require('axios');
 const dotenv = require('dotenv');
+const FormData = require('form-data');
 
 // winston logger
 const winston = require('winston');
@@ -42,10 +44,6 @@ app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(multer().single());
-app.use(multer().array());
-app.use(multer().fields());
-app.use(methodOverride());
 
 const winstonLogFormat = {
   format: combine(
@@ -96,29 +94,35 @@ app.get("/contents/play", (req, res, next) => {
   res.json({jwt : jwt.sign(payload), customKey : process.env.CUSTOM_USER_KEY});
 });
 
-app.post("/contents/upload", (req, res, next) => {
-  res.json({message:"Hello, World!"});
+app.get("/contents/upload/url", async (req, res, next) => {
+  let formData = new FormData();
+  // is_encryption_upload : 0은 일반 업로드, 1은 암호화 업로드
+  formData.append("is_encryption_upload", 1);
+
+  const response = await axios.post(constants.KOLLUS_CREATE_UPLOAD_URL+'?access_token='+process.env.ACCESS_TOKEN,
+    formData,
+    {headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+  );
+  
+  // console.log(response.data);
+  res.json(response.data);
 });
 
-app.get("/contents/download", (req, res, next) => {
-  res.json({message:"Hello, World!"});
-});
-
-app.get("/contents/download/refresh", (req, res, next) => {
-  res.json({message:"Hello, World!"});
-});
-
-// lms callback
-app.get('/lms/callback', (req, res, next) => {
-  //request 처리 후
-  io.emit('lms/response', req);
+app.get('kollus-sample-reactjs/lms-callback', (req, res, next) => {
+  io.emit('kollus-sample-reactjs/lms-response', req);
 });
 
 // ----- example code -----
-
 app.get("/", (req, res, next) => {
   console.log("Hello, World!");
   // res.redirect("/");
+});
+
+// file upload
+var upload = multer({ dest: 'tmp/'});
+app.post("/contents/upload", upload.single('content'), (req, res, next) => {
+  console.log(req);
+  res.json({message:"Hello, World!"});
 });
 
 // ----- socket.io sample start -----
@@ -131,6 +135,11 @@ io.on('connection', (socket) => {
     io.emit('socket-sample', msg);
   });
 });
+
+// one-direction response
+// app.get('/lms/callback', (req, res, next) => {
+//   io.emit('lms/response', req);
+// });
 // ----- socket.io sample end -----
 
 

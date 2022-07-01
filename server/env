@@ -1,3 +1,4 @@
+# 해당 파일을 .env 로 생성해주세요.
 # 서비스 계정명
 CLIENT_USER_ID=dh.lim
 

@@ -13,6 +13,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import Input from '@mui/material/Input';
+import Button from '@mui/material/Button';
 
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
@@ -119,14 +121,17 @@ export default function Template(props) {
         </DrawerHeader>
         <Divider />
         <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <FileUploadIcon />
-              </ListItemIcon>
-              <ListItemText primary="Upload" />
-            </ListItemButton>
-          </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton sx={{cursor:"default"}}>
+                <ListItemIcon>
+                  <FileUploadIcon sx={{cursor:"pointer"}} onClick={props.uploadFile}/>
+                </ListItemIcon>
+              <label htmlFor="contained-button-file">
+                <Input id="contained-button-file" multiple type="file" name="content" onChange={props.uploadFileSelect} sx={{display:"none"}}/>
+                <ListItemText primary={props.selectedContentTitle} sx={{cursor:"pointer"}}/>
+              </label>
+              </ListItemButton>
+            </ListItem>
         </List>
         <Divider />
         <List>
