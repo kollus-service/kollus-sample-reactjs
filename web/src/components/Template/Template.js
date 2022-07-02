@@ -14,7 +14,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Input from '@mui/material/Input';
-import Button from '@mui/material/Button';
 
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
@@ -72,14 +71,20 @@ export default function Template(props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
-  const toggleDrawer = (open) =>
-  (event) => {
-    if ( event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift') ) {
-      return;
-    }
+  const toggleDrawer = (open) => {
+    return (event) => {
+      if ( event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift') ) {
+        return;
+      }
+  
+      setOpen(!open);
+      if(open === false) {
+        props.refreshContentsList();
+        props.getContentsList();
+      }
+    };
 
-    setOpen(!open);
-  };
+  }
 
   return (
     <Box>
@@ -135,16 +140,19 @@ export default function Template(props) {
         </List>
         <Divider />
         <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem key={text} disablePadding>
+          {props.contentsList.data.map((content, index) => {
+            return (
+            <ListItem key={content} disablePadding onClick={() => {
+              props.refresh();
+              props.initialMcKey(content.mckey);
+              props.getPlayInfo();
+              props.updateContentInfo();
+              }}>
               <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText primary={content.title}/>
               </ListItemButton>
             </ListItem>
-          ))}
+          )})}
         </List>
       </Drawer>
       <Main open={open}>

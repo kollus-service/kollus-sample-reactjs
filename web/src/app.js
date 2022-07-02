@@ -1,61 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { isMobile } from 'react-device-detect';
-import Container from '@mui/material/Container';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
+import axios from "axios";
+import { debounce } from "lodash";
+import { io } from "socket.io-client";
+import { isMobile } from "react-device-detect";
+import Container from "@mui/material/Container";
 
-import Content from './components/Template/Content'
-import Template from './components/Template/Template'
-import * as config from './config';
-import useDidMountEffect from './hoc/useDidMountEffect';
+import Content from "./components/Template/Content";
+import Template from "./components/Template/Template";
+import * as config from "./config";
+import useDidMountEffect from "./hoc/useDidMountEffect";
 
 export default function App() {
   const [playInfo, setPlayInfo] = useState({
-    jwt : null,
-    customKey : null,
-  })
-  const [mckey, setMckey] = useState(config.DEFAULT_MCKEY)
-  const [content, setContent] = useState(null);
-  const [contentDownload, setContentDownload] = useState(null);
-  const [selectedContent, setSelectedContent] = useState(null);
-  const [selectedContentTitle, setSelectedContentTitle] = useState("Upload");
+    jwt: null,
+    customKey: null,
+  });
+  const [contentInfo, setContentInfo] = useState({
+    play: null,
+    download: null,
+  });
+  const [selectedContent, setSelectedContent] = useState({
+    selected: null,
+    title: "Upload",
+  });
+  const [contentsList, setContentsList] = useState({
+    data: [],
+    state: null,
+  });
+  const [mckey, setMckey] = useState(config.DEFAULT_MCKEY);
 
-  const getPlayInfo = async(isRefresh, userMckey) => {
-    let response;
+  const refresh = () => {
+      setPlayInfo({ jwt: null, customKey: null });
+  }
 
-    if (isRefresh) {
-      setPlayInfo({jwt : null, customKey : null});
-    }
-    
-    if (userMckey) {
-      setMckey(userMckey);
-    }
+  const initialMcKey = (userMckey) => {
+    setMckey(userMckey);
+  }
 
-    // axios call 은 한번만
-    if(playInfo.customKey == null || playInfo.jwt == null) {
-      response = await axios.get( config.BASE_URL+"/contents/play?mckey=" + mckey);
+  const getPlayInfo = async () => {
+    if(playInfo.jwt == null || playInfo.customKey == null) {
+      const response = await axios.get(
+        config.BASE_URL + "/content/play?mckey=" + mckey
+      );
       console.log(response);
-      setPlayInfo(prevState => {
+      setPlayInfo((prevState) => {
         return {
           ...prevState,
-          jwt : response.data.jwt,
-          customKey : response.data.customKey,
-        }
+          jwt: response.data.jwt,
+          customKey: response.data.customKey,
+        };
       });
     }
-    
-    setContent(config.VG_URL+'/s?jwt='+playInfo.jwt+'&custom_key='+playInfo.customKey+'&loadcheck=0');
-    setContentDownload(config.KOLLUS_DOWNLOAD+'?url='+config.VG_URL+'/si?jwt='+playInfo.jwt+'&custom_key='+playInfo.customKey+'&loadcheck=0');
+  };
+
+  const updateContentInfo = () => {
+    setContentInfo((prevState) => {
+      return {
+        ...prevState,
+        play:
+          config.VG_URL + "/s?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0",
+        download:
+          config.KOLLUS_DOWNLOAD + "?url=" + config.VG_URL + "/si?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0",
+      };
+    });
+  }
+
+  const refreshContentsList = () => {
+    setContentsList({ data : [], state : false, });
+  }
+  const getContentsList = async (isRefresh) => {
+    if(contentsList.state == false) {
+      const response = await axios.get(config.BASE_URL + "/content/list");
+      setContentsList((prevState) => {
+        return {
+          ...prevState,
+          data: response.data,
+          state: true,
+        };
+      });
+    }
   };
 
   const downloadFile = () => {
-    document.location.href = contentDownload;
-  }
+    document.location.href = contentInfo.download;
+  };
 
   const uploadFile = async (event) => {
     let formData = new FormData();
-    formData.append("upload-file", selectedContent);
+    formData.append("upload-file", selectedContent.selected);
 
-    const uploadUrlInfo = await axios.get(config.BASE_URL+"/contents/upload/url");
+    const uploadUrlInfo = await axios.get(
+      config.BASE_URL + "/content/upload/url"
+    );
     // console.log(uploadUrlInfo.data.result.upload_url);
     let uploadUrl = uploadUrlInfo.data.result.upload_url;
 
@@ -66,36 +102,72 @@ export default function App() {
         data: formData,
         headers: { "Content-Type": "multipart/form-data" },
       });
+      
       console.log(response);
       alert(response.data.message);
-    } catch(error) {
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
-  }
+  };
 
   const uploadFileSelect = (event) => {
-    if(event.target.files.length > 0) {
-      setSelectedContentTitle(event.target.files[0].name);
-      setSelectedContent(event.target.files[0])
+    if (event.target.files.length > 0) {
+      setSelectedContent((prevState) => {
+        return {
+          ...prevState,
+          selected: event.target.files[0],
+          title: event.target.files[0].name,
+        };
+      });
     } else {
-      setSelectedContentTitle("Upload");
-      setSelectedContent(null)
+      setSelectedContent({
+        selected: null,
+        title: "Upload",
+      });
     }
-  }
+  };
 
   useEffect(() => {
     getPlayInfo();
-  }, [content]);
+    updateContentInfo();
+    return () => {};
+  }, [playInfo.jwt]);
 
-  // Mount 완료 후 동작
-  useDidMountEffect(() => {
-  }, []);
+  useLayoutEffect(() => {
+    getContentsList();
+    return () => {};
+  }, [contentsList.state]);
 
-  let main = <Content getPlayInfo={getPlayInfo} downloadFile={downloadFile} isMobile={isMobile} content={content}/>;
+//   refresh
+// initialMcKey
+  let main = (
+    <Content
+      getPlayInfo={getPlayInfo}
+      downloadFile={downloadFile}
+      isMobile={isMobile}
+      content={contentInfo.play}
+      updateContentInfo={updateContentInfo}
+      refresh={refresh}
+      />
+      );
+      
+      return (
+        <Container>
+      <Template
+        title={config.DEFAULT_TITLE}
+        main={main}
+        uploadFile={uploadFile}
+        uploadFileSelect={uploadFileSelect}
+        selectedContentTitle={selectedContent.title}
+        getContentsList={getContentsList}
+        refresh={refresh}
+        refreshContentsList={refreshContentsList}
+        getPlayInfo={getPlayInfo}
+        updateContentInfo={updateContentInfo}
+        initialMcKey={initialMcKey}
 
-  return (
-    <Container>
-      <Template title={config.DEFAULT_TITLE} main={main} uploadFile={uploadFile} uploadFileSelect={uploadFileSelect} selectedContentTitle={selectedContentTitle} />
+        contentsList={contentsList}
+      />
     </Container>
   );
 }

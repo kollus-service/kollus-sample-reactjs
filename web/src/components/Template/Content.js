@@ -23,7 +23,7 @@ export default function Content(props) {
           <Button variant="contained" color="neutral" onClick={() => {props.downloadFile()}}>Download</Button>
         </Grid>
         <Grid item xs={6} style={{padding:"0 0 0 1rem"}}>
-          <Button variant="contained" color="neutral"  onClick={() => props.getPlayInfo(true)}>Refresh</Button>
+          <Button variant="contained" color="neutral" onClick={() => {props.refresh(); props.getPlayInfo(); props.updateContentInfo();}}>Refresh</Button>
         </Grid>
       </Grid>
       <Copyright />

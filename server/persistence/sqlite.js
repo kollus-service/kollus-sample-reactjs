@@ -20,7 +20,7 @@ function init() {
                 console.log(`Using sqlite database at ${location}`);
 
             db.run(
-                'CREATE TABLE IF NOT EXISTS contents_list (id varchar(36), title varchar(400), mckey varchar(200), cdtm datetime default current_timestamp)',
+                'CREATE TABLE IF NOT EXISTS contents_list (id varchar(36), title varchar(400), mckey varchar(200), cdtm datetime default current_timestamp, udtm datetime)',
                 (err, result) => {
                     if (err) return rej(err);
                     acc();
@@ -45,24 +45,20 @@ async function getContents() {
             if (err) return rej(err);
             acc(
                 rows.map(content =>
-                    Object.assign({}, content, {
-                        completed: content.completed === 1,
-                    }),
+                    Object.assign({}, content),
                 ),
             );
         });
     });
 }
 
-async function getContent(id) {
+async function getContent(mckey) {
     return new Promise((acc, rej) => {
-        db.all('SELECT * FROM contents_list WHERE id=?', [id], (err, rows) => {
+        db.all('SELECT * FROM contents_list WHERE mckey=?', [mckey], (err, rows) => {
             if (err) return rej(err);
             acc(
                 rows.map(content =>
-                    Object.assign({}, content, {
-                        completed: content.completed === 1,
-                    }),
+                    Object.assign({}, content),
                 )[0],
             );
         });
@@ -82,9 +78,22 @@ async function storeContent(content) {
     });
 }
 
-async function removeContent(id) {
+async function updateContent(mckey, content) {
+  return new Promise((acc, rej) => {
+      db.run(
+          'UPDATE contents_list SET title=?, udtm=? WHERE mckey = ?',
+          [content.title, content.udtm, mckey],
+          err => {
+              if (err) return rej(err);
+              acc();
+          },
+      );
+  });
+}
+
+async function removeContent(mckey) {
     return new Promise((acc, rej) => {
-        db.run('DELETE FROM contents_list WHERE mckey = ?', [id], err => {
+        db.run('DELETE FROM contents_list WHERE mckey = ?', [mckey], err => {
             if (err) return rej(err);
             acc();
         });
@@ -97,5 +106,6 @@ module.exports = {
     getContents,
     getContent,
     storeContent,
+    updateContent,
     removeContent,
 };

@@ -1,13 +1,13 @@
 const db = require('../persistence');
-const uuid = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 
-module.exports = async (req, res) => {
-    const item = {
-        id: uuid(),
+module.exports = async (req, res, next) => {
+    const content = {
+        id: uuidv4(),
         title: req.body.filename,
         mckey: req.body.media_content_key,
     };
 
-    await db.storeItem(item);
-    res.send(item);
+    await db.storeContent(content);
+    res.send(content);
 };

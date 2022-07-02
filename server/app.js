@@ -19,6 +19,7 @@ const { combine, timestamp, colorize, json } = winston.format;
 const db = require('./persistence');
 const getContents = require('./routes/getContents');
 const addContent = require('./routes/addContent');
+const updateContent = require('./routes/updateContent');
 const deleteContent = require('./routes/deleteContent');
 
 const constants = require('./lib/constants');
@@ -36,14 +37,14 @@ const io = require('socket.io')(http, {
 });
 
 const PORT = process.env.PORT || 9081;
-const SOCKET_PORT = 9082;
+const SOCKET_PORT = process.env.SOCKET_PORT || 9082;
 
 // api 서버에서 cors 허용
 const cors = require('cors');
 app.use(cors());
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 const winstonLogFormat = {
   format: combine(
@@ -78,11 +79,12 @@ const winstonLogFormat = {
 app.use(expressWinston.logger(winstonLogFormat));
 app.use(expressWinston.errorLogger(winstonLogFormat));
 
-app.post("/contents/add/callback", addContent);
-app.post("/contents/delete/callback", deleteContent);
-app.get("/contents/list", getContents);
+app.post("/content/add/callback", addContent);
+app.post("/content/update/callback", updateContent);
+app.post("/content/delete/callback", deleteContent);
+app.get("/content/list", getContents);
 
-app.get("/contents/play", (req, res, next) => {
+app.get("/content/play", (req, res, next) => {
   let payload = {
     mc: [{
       mckey: req.query.mckey,
@@ -94,7 +96,7 @@ app.get("/contents/play", (req, res, next) => {
   res.json({jwt : jwt.sign(payload), customKey : process.env.CUSTOM_USER_KEY});
 });
 
-app.get("/contents/upload/url", async (req, res, next) => {
+app.get("/content/upload/url", async (req, res, next) => {
   let formData = new FormData();
   // is_encryption_upload : 0은 일반 업로드, 1은 암호화 업로드
   formData.append("is_encryption_upload", 1);
@@ -108,8 +110,8 @@ app.get("/contents/upload/url", async (req, res, next) => {
   res.json(response.data);
 });
 
-app.get('kollus-sample-reactjs/lms-callback', (req, res, next) => {
-  io.emit('kollus-sample-reactjs/lms-response', req);
+app.get('/lms-callback', (req, res, next) => {
+  io.emit('lms-callback-response', req);
 });
 
 // ----- example code -----
@@ -120,7 +122,7 @@ app.get("/", (req, res, next) => {
 
 // file upload
 var upload = multer({ dest: 'tmp/'});
-app.post("/contents/upload", upload.single('content'), (req, res, next) => {
+app.post("/content/upload", upload.single('content'), (req, res, next) => {
   console.log(req);
   res.json({message:"Hello, World!"});
 });
