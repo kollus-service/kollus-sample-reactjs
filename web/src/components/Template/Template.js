@@ -100,7 +100,7 @@ export default function Template(props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" onClick={()=>{document.location.href = "/";}} sx={{cursor:"pointer"}}>
           {props.title}
           </Typography>
         </Toolbar>
