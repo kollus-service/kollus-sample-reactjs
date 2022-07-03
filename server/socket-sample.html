@@ -20,10 +20,10 @@
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
-    <script src="//localhost:8081/socket.io/socket.io.js"></script>
+    <script src="//localhost:9082/socket.io/socket.io.js"></script>
 
     <script>
-      var socket = io('//localhost:8081');
+      var socket = io('//localhost:9082');
 
       var messages = document.getElementById('messages');
       var form = document.getElementById('form');

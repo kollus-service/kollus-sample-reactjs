@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import axios from "axios";
-import { debounce } from "lodash";
-import { io } from "socket.io-client";
 import { isMobile } from "react-device-detect";
-import Container from "@mui/material/Container";
-
-import Content from "./components/Template/Content";
-import Template from "./components/Template/Template";
 import * as config from "./config";
-import useDidMountEffect from "./hoc/useDidMountEffect";
+
+import Container from "@mui/material/Container";
+import Template from "./components/Template/Template";
+import Content from "./components/Template/Content";
+import LmsMessage from "./components/LmsMessage/LmsMessage";
 
 export default function App() {
   const [playInfo, setPlayInfo] = useState({
@@ -30,19 +28,19 @@ export default function App() {
   const [mckey, setMckey] = useState(config.DEFAULT_MCKEY);
 
   const refresh = () => {
-      setPlayInfo({ jwt: null, customKey: null });
-  }
+    setPlayInfo({ jwt: null, customKey: null });
+  };
 
   const initialMcKey = (userMckey) => {
     setMckey(userMckey);
-  }
+  };
 
   const getPlayInfo = async () => {
-    if(playInfo.jwt == null || playInfo.customKey == null) {
+    if (playInfo.jwt == null || playInfo.customKey == null) {
       const response = await axios.get(
         config.BASE_URL + "/content/play?mckey=" + mckey
       );
-      console.log(response);
+      // console.log(response);
       setPlayInfo((prevState) => {
         return {
           ...prevState,
@@ -63,13 +61,13 @@ export default function App() {
           config.KOLLUS_DOWNLOAD + "?url=" + config.VG_URL + "/si?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0",
       };
     });
-  }
+  };
 
   const refreshContentsList = () => {
-    setContentsList({ data : [], state : false, });
-  }
+    setContentsList({ data: [], state: false });
+  };
   const getContentsList = async (isRefresh) => {
-    if(contentsList.state == false) {
+    if (contentsList.state == false) {
       const response = await axios.get(config.BASE_URL + "/content/list");
       setContentsList((prevState) => {
         return {
@@ -89,26 +87,42 @@ export default function App() {
     let formData = new FormData();
     formData.append("upload-file", selectedContent.selected);
 
-    const uploadUrlInfo = await axios.get(
+    const uploadUrlInfoResponse = await axios.get(
       config.BASE_URL + "/content/upload/url"
     );
-    // console.log(uploadUrlInfo.data.result.upload_url);
-    let uploadUrl = uploadUrlInfo.data.result.upload_url;
+    // console.log(uploadUrlInfoResponse);
+
+    const uploadUrlInfo = uploadUrlInfoResponse.data.result;
 
     try {
-      const response = await axios({
+      const uploadResponse = await axios({
         method: "post",
-        url: uploadUrl,
+        url: uploadUrlInfo.upload_url,
         data: formData,
         headers: { "Content-Type": "multipart/form-data" },
       });
-      
-      console.log(response);
-      alert(response.data.message);
+
+      // console.log(uploadResponse);
+      alert(uploadResponse.data.message);
+      // uploadFileCheck(uploadUrlInfo.progress_url);
     } catch (error) {
       console.log(error);
     }
+    
   };
+
+  // const uploadFileCheck = (progress_url) => {
+  //   const id = setInterval(async() => {
+  //     const progressResponse = await axios.get(
+  //       progress_url
+  //     );
+
+  //     console.log(progressResponse.data.result.progress);
+  //     if (progressResponse.data.result.progress == 100) {
+  //       clearInterval(id);
+  //     }
+  //   }, 1000);
+  // }
 
   const uploadFileSelect = (event) => {
     if (event.target.files.length > 0) {
@@ -138,8 +152,6 @@ export default function App() {
     return () => {};
   }, [contentsList.state]);
 
-//   refresh
-// initialMcKey
   let main = (
     <Content
       getPlayInfo={getPlayInfo}
@@ -148,11 +160,11 @@ export default function App() {
       content={contentInfo.play}
       updateContentInfo={updateContentInfo}
       refresh={refresh}
-      />
-      );
-      
-      return (
-        <Container>
+    />
+  );
+
+  return (
+    <Container>
       <Template
         title={config.DEFAULT_TITLE}
         main={main}
@@ -165,9 +177,9 @@ export default function App() {
         getPlayInfo={getPlayInfo}
         updateContentInfo={updateContentInfo}
         initialMcKey={initialMcKey}
-
         contentsList={contentsList}
       />
+      <LmsMessage />
     </Container>
   );
 }
