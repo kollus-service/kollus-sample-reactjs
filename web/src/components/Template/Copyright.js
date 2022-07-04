@@ -7,7 +7,7 @@ export default function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://www.catenoid.net/">
+      <Link color="inherit" href="https://www.catenoid.net/" target="_blank">
         CATENOID
       </Link>{' '}
       {new Date().getFullYear()}
