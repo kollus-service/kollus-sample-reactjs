@@ -66,6 +66,7 @@ export default function App() {
   const refreshContentsList = () => {
     setContentsList({ data: [], state: false });
   };
+  
   const getContentsList = async (isRefresh) => {
     if (contentsList.state == false) {
       const response = await axios.get(config.BASE_URL + "/content/list");

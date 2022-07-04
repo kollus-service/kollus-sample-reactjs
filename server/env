@@ -11,5 +11,5 @@ ACCESS_TOKEN=sj988xe5eaey13i4
 # 사용자 키
 CUSTOM_USER_KEY=cd300b44b9150b57c8400bde82c825d34743f587ce2b776a353d9c8f9dc95040
 
-# 채널 키
-CHANNEL_KEY=4vmklecshbvyu6sa
+# 카테고리 키
+CATEGORY_KEY=yrbhtapmwpigp1nd
