@@ -79,13 +79,13 @@ const winstonLogFormat = {
 app.use(expressWinston.logger(winstonLogFormat));
 app.use(expressWinston.errorLogger(winstonLogFormat));
 
-app.post("/content/add/callback", (e) => {
-  addContent(e);
+app.post("/content/add/callback", async (req, res, next) => {
+  addContent(req, res, next);
   // io.emit("content-callback-response", req.body);
 });
 app.post("/content/update/callback", updateContent);
-app.post("/content/delete/callback", () => {
-  deleteContent(e);
+app.post("/content/delete/callback", async (req, res, next) => {
+  deleteContent(req, res, next);
   // io.emit("content-callback-response", req.body);
 });
 app.get("/content/list", getContents);
