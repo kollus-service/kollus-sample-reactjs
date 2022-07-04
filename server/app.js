@@ -79,9 +79,15 @@ const winstonLogFormat = {
 app.use(expressWinston.logger(winstonLogFormat));
 app.use(expressWinston.errorLogger(winstonLogFormat));
 
-app.post("/content/add/callback", addContent);
+app.post("/content/add/callback", (e) => {
+  addContent(e);
+  // io.emit("content-callback-response", req.body);
+});
 app.post("/content/update/callback", updateContent);
-app.post("/content/delete/callback", deleteContent);
+app.post("/content/delete/callback", () => {
+  deleteContent(e);
+  // io.emit("content-callback-response", req.body);
+});
 app.get("/content/list", getContents);
 
 app.get("/content/play", (req, res, next) => {
@@ -102,6 +108,7 @@ app.get("/content/upload/url", async (req, res, next) => {
   let formData = new FormData();
   // is_encryption_upload : 0은 일반 업로드, 1은 암호화 업로드
   formData.append("is_encryption_upload", 1);
+  formData.append("category_key", process.env.CATEGORY_KEY);
 
   const response = await axios.post(
     constants.KOLLUS_CREATE_UPLOAD_URL + "?access_token=" + process.env.ACCESS_TOKEN,
@@ -112,7 +119,7 @@ app.get("/content/upload/url", async (req, res, next) => {
   res.json(response.data);
 });
 
-app.post("/lms-callback", (req, res, next) => {
+app.post("/lms-callback", async(req, res, next) => {
   io.emit("lms-callback-response", req.body);
   res.json(req.body);
 });
