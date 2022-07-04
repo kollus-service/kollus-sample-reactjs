@@ -12,7 +12,7 @@ export default function PositionedSnackbar(porps) {
 
   return (
     <div>
-      <Snackbar anchorOrigin={{ vertical, horizontal }} open={porps.alertOpen} autoHideDuration={3000} onClose={porps.closeMessage}>
+      <Snackbar anchorOrigin={{ vertical, horizontal }} open={porps.alertOpen} autoHideDuration={1500} onClose={porps.closeMessage}>
         <Alert onClose={porps.closeMessage} severity="success" sx={{ width: '100%' }}>
           Received LMS message!<br/>
           hash : {porps.message.hash}
