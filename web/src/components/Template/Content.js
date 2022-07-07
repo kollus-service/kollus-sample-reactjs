@@ -17,13 +17,14 @@ export default function Content(props) {
         </Box>
       )
       }
-      {isMobile && (
+
+      {props.mckey && isMobile && (
         <MobileView>
           <iframe id="kollus-mobile-player" className="kollus-player" width="100%" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
         </MobileView>
       )}
       
-      {isBrowser && (
+      {props.mckey && isBrowser && (
         <Box display="flex" justifyContent="center" alignItems="center">
           <iframe id="kollus-player" className="kollus-player" width="640" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
         </Box>
