@@ -9,13 +9,23 @@ import Copyright from './Copyright'
 export default function Content(props) {
   return (
     <div>
-      {props.isMobile ? (
-        <MobileView>
-          <iframe width="100%" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
-        </MobileView>
-      ) : (
+      {!props.mckey && (
         <Box display="flex" justifyContent="center" alignItems="center">
-          <iframe width="640" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
+          <Box component="div" display="flex" justifyContent="center" sx={{ width:640, height:480, border: '1px dashed grey', alignItems: 'center' }}>
+            <p style={{fontWeight: 'bold'}}>Please Select a Video</p>
+          </Box>
+        </Box>
+      )
+      }
+      {props.isMobile && (
+        <MobileView>
+          <iframe id="kollus-mobile-player" className="kollus-player" width="100%" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
+        </MobileView>
+      )}
+      
+      {props.isBrowser && (
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <iframe id="kollus-player" className="kollus-player" width="640" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
         </Box>
       )}
       <Grid style={{margin: "2rem 0"}} display="flex" justifyContent="center" alignItems="center" container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>

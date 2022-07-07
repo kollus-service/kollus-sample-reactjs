@@ -25,7 +25,7 @@ export default function App() {
     data: [],
     state: null,
   });
-  const [mckey, setMckey] = useState(config.DEFAULT_MCKEY);
+  const [mckey, setMckey] = useState(null);
 
   const refresh = () => {
     setPlayInfo({ jwt: null, customKey: null });
@@ -36,6 +36,8 @@ export default function App() {
   };
 
   const getPlayInfo = async () => {
+    if (mckey == null) return;
+
     if (playInfo.jwt == null || playInfo.customKey == null) {
       const response = await axios.get(
         config.BASE_URL + "/content/play?mckey=" + mckey
@@ -52,11 +54,13 @@ export default function App() {
   };
 
   const updateContentInfo = () => {
+    if (mckey == null) return;
+
     setContentInfo((prevState) => {
       return {
         ...prevState,
         play:
-          config.VG_URL + "/s?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0",
+          config.VG_URL + "/s?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0&s=0",
         download:
           config.KOLLUS_DOWNLOAD + "?url=" + config.VG_URL + "/si?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0",
       };
@@ -155,6 +159,7 @@ export default function App() {
 
   let main = (
     <Content
+      mckey={mckey}
       getPlayInfo={getPlayInfo}
       downloadFile={downloadFile}
       isMobile={isMobile}
