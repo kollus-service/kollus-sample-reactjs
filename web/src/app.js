@@ -36,8 +36,6 @@ export default function App() {
   };
 
   const getPlayInfo = async () => {
-    if (mckey == null) return;
-
     if (playInfo.jwt == null || playInfo.customKey == null) {
       const response = await axios.get(
         config.BASE_URL + "/content/play?mckey=" + mckey
