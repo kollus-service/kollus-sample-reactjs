@@ -119,7 +119,15 @@ app.get("/content/upload/url", async (req, res, next) => {
   res.json(response.data);
 });
 
+let lmsCallbackSleep = 0;
+app.get("/config/lms-callback/sleep/:count", async (req, res, next) => {
+  lmsCallbackSleep = req.params.count;
+  res.json({status:"success", sleep:lmsCallbackSleep});
+});
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 app.post("/lms-callback", async(req, res, next) => {
+  if(lmsCallbackSleep>0) await delay(lmsCallbackSleep)
   io.emit("lms-callback-response", req.body);
   res.json(req.body);
 });
