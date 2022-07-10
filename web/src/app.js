@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import axios from "axios";
 import { isMobile } from "react-device-detect";
 import * as config from "./config";
+import * as hash from "./utils/hash"
 
 import Container from "@mui/material/Container";
 import Template from "./components/Template/Template";
@@ -26,6 +27,8 @@ export default function App() {
     state: null,
   });
   const [mckey, setMckey] = useState(null);
+
+  const [userKey, setUserKey] = useState(hash.randomStr());
 
   const refresh = () => {
     setPlayInfo({ jwt: null, customKey: null });
@@ -58,7 +61,7 @@ export default function App() {
       return {
         ...prevState,
         play:
-          config.VG_URL + "/s?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0&s=0",
+          config.VG_URL + "/s?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0&s=0&uservalue0=" + userKey,
         download:
           config.KOLLUS_DOWNLOAD + "?url=" + config.VG_URL + "/si?jwt=" + playInfo.jwt + "&custom_key=" + playInfo.customKey + "&loadcheck=0",
       };
@@ -80,6 +83,11 @@ export default function App() {
         };
       });
     }
+  };
+
+  const drmRefresh = async () => {
+    const response = await axios.get(config.BASE_URL + "/content/drm/refresh");
+    console.log(response);
   };
 
   const downloadFile = () => {
@@ -163,7 +171,7 @@ export default function App() {
       isMobile={isMobile}
       content={contentInfo.play}
       updateContentInfo={updateContentInfo}
-      refresh={refresh}
+      drmRefresh={drmRefresh}
     />
   );
 
@@ -183,7 +191,7 @@ export default function App() {
         initialMcKey={initialMcKey}
         contentsList={contentsList}
       />
-      <LmsMessage />
+      <LmsMessage userKey={userKey} />
     </Container>
   );
 }

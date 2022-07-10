@@ -2,7 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useCallback, } from "react
 import SnackBar from "../../components/Template/SnackBar";
 import { newSocket } from "../../context/socket";
 
-const LmsMessage = () => {
+const LmsMessage = (props) => {
   const [socket, setSocket] = useState(newSocket);
   const [message, setMessage] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
@@ -25,12 +25,12 @@ const LmsMessage = () => {
   }, []);
 
   useEffect(() => {
-    socket.on("lms-callback-response", (e) => {
+    socket.on("lms-callback-response/"+props.userKey, (e) => {
       openMessage(true);
       receivedMessage(e);
     });
     return () => {
-      socket.off("lms-callback-response", (e) => {
+      socket.off("lms-callback-response/"+props.userKey, (e) => {
         openMessage(true);
         receivedMessage(e);
       });
