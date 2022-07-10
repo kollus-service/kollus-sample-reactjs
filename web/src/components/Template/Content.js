@@ -31,10 +31,14 @@ export default function Content(props) {
       )}
       <Grid style={{margin: "2rem 0"}} display="flex" justifyContent="center" alignItems="center" container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid item xs={6} style={{textAlign:"end", padding:"0 1rem 0 0"}}>
+        {props.mckey && (
           <Button variant="contained" color="neutral" onClick={() => {props.downloadFile()}}>Download</Button>
+        )}
         </Grid>
         <Grid item xs={6} style={{padding:"0 0 0 1rem"}}>
+        {props.mckey && (
           <Button variant="contained" color="neutral" onClick={() => {props.drmRefresh()}}>Refresh</Button>
+        )}
         </Grid>
       </Grid>
       <Copyright />
