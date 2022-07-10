@@ -81,14 +81,85 @@ app.use(expressWinston.errorLogger(winstonLogFormat));
 
 app.post("/content/add/callback", async (req, res, next) => {
   addContent(req, res, next);
-  // io.emit("content-callback-response", req.body);
 });
-app.post("/content/update/callback", updateContent);
 app.post("/content/delete/callback", async (req, res, next) => {
   deleteContent(req, res, next);
-  // io.emit("content-callback-response", req.body);
 });
+app.post("/content/update/callback", updateContent);
 app.get("/content/list", getContents);
+
+let expireTime = Math.round(new Date().getTime() / 1000) + constants.EXPIRE_TIME;
+let contentExpired = 0;
+let contentExpiredReset = 0;
+
+app.post("/content/drm/callback", (req, res, next) => {
+  console.log(req.body);
+
+  let kind;
+  let media_content_key;
+
+  let currentTime = Math.round(new Date().getTime() / 1000);
+  let addPayload;
+  let result = 1;
+
+  switch(kind) {
+    case 1 :
+      if(expireTime < currentTime) {
+        result = 0;
+      }
+
+      addPayload = {
+        expiration_date : expireTime,
+        result : result,
+      };
+      break;
+
+    case 2 :
+      break;
+
+    case 3 :
+      if(contentExpiredReset == 0 && expireTime < currentTime) {
+        contentExpired = 1;
+        result = 0;
+      }
+
+      addPayload = {
+        expiration_date : expireTime,
+        content_expired : contentExpired,
+        content_expire_reset : contentExpiredReset,
+        result : result,
+      };
+
+      //addPayload 에 들어가고 나면 다시 0으로 스위치 off
+      if (contentExpiredReset == 1) contentExpiredReset = 0; 
+      break;
+  }
+
+  let payload = {
+    kind: this.kind,
+    media_content_key: this.media_content_key,
+    result: 1,
+    ...addPayload,
+  };
+
+  res.set('X-Kollus-UserKey', process.env.CUSTOM_USER_KEY);
+  res.json({ jwt: jwt.sign(payload), customKey: process.env.CUSTOM_USER_KEY });
+});
+
+app.get("/content/drm/refresh", (req, res, next) => {
+  let oldExpireTime = expireTime;
+  expireTime = Math.round(new Date().getTime() / 1000) + constants.EXPIRE_TIME;
+  contentExpired = 0;
+  contentExpiredReset = 1;
+
+  res.status(200).json({
+    message:"DRM refreshed!",
+    old: oldExpireTime,
+    new: expireTime,
+    contentExpired : contentExpired,
+    contentExpiredReset : contentExpiredReset,
+  });
+});
 
 app.get("/content/play", (req, res, next) => {
   let payload = {
@@ -128,7 +199,8 @@ app.get("/config/lms-callback/sleep/:count", async (req, res, next) => {
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 app.post("/lms-callback", async(req, res, next) => {
   if(lmsCallbackSleep>0) await delay(lmsCallbackSleep)
-  io.emit("lms-callback-response", req.body);
+
+  io.emit("lms-callback-response/"+req.body.uval0, req.body);
   res.json(req.body);
 });
 
