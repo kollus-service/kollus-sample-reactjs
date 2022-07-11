@@ -93,10 +93,13 @@ let contentExpired = 0;
 let contentExpiredReset = 0;
 
 app.post("/content/drm/callback", (req, res, next) => {
-  console.log(req.body);
+  //console.log(req.body);
+  let jsonData = JSON.parse(req.body.items);
+  jsonData = jsonData[0];
 
-  let kind;
-  let media_content_key;
+  let kind = jsonData.kind;
+  let mediaContentKey = jsonData.media_content_key;
+  let sessionKey= jsonData.session_key;
 
   let currentTime = Math.round(new Date().getTime() / 1000);
   let addPayload;
@@ -127,6 +130,7 @@ app.post("/content/drm/callback", (req, res, next) => {
         expiration_date : expireTime,
         content_expired : contentExpired,
         content_expire_reset : contentExpiredReset,
+        session_key : sessionKey,
         result : result,
       };
 
@@ -136,14 +140,16 @@ app.post("/content/drm/callback", (req, res, next) => {
   }
 
   let payload = {
-    kind: this.kind,
-    media_content_key: this.media_content_key,
+    kind: kind,
+    media_content_key: mediaContentKey,
     result: 1,
     ...addPayload,
   };
 
   res.set('X-Kollus-UserKey', process.env.CUSTOM_USER_KEY);
-  res.json({ jwt: jwt.sign(payload), customKey: process.env.CUSTOM_USER_KEY });
+  let data = Array(payload);
+  let responseJWT = jwt.sign({data});
+  res.send(responseJWT);
 });
 
 app.get("/content/drm/refresh", (req, res, next) => {
@@ -172,7 +178,8 @@ app.get("/content/play", (req, res, next) => {
     expt: Math.round(new Date().getTime() / 1000) + constants.EXPIRE_TIME,
   };
 
-  res.json({ jwt: jwt.sign(payload), customKey: process.env.CUSTOM_USER_KEY });
+  let responseJWT = { jwt: jwt.sign(payload), customKey: process.env.CUSTOM_USER_KEY };
+  res.json(responseJWT);
 });
 
 app.get("/content/upload/url", async (req, res, next) => {
