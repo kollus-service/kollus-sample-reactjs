@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { BrowserView, MobileView, isBrowser, isMobile } from 'react-device-detect';
 
 import Box from '@mui/material/Box';
@@ -26,7 +26,16 @@ export default function Content(props) {
       
       {props.mckey && isBrowser && (
         <Box display="flex" justifyContent="center" alignItems="center">
-          <iframe id="kollus-player" className="kollus-player" width="640" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
+          <iframe id="kollus-player" className="kollus-player" onLoad={()=>{
+            let controller = new VgControllerClient({
+              //getElementById 값의 영상이 나올 iframe의 id값을 넣으시면 됩니다. 
+              target_window: document.getElementById('kollus-player').contentWindow
+            });
+
+            controller.on('ready', function() {
+              localStorage.setItem('player_id',controller.get_player_id())
+            });
+            }} width="640" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
         </Box>
       )}
       <Grid style={{margin: "2rem 0"}} display="flex" justifyContent="center" alignItems="center" container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -37,7 +46,7 @@ export default function Content(props) {
         </Grid>
         <Grid item xs={6} style={{padding:"0 0 0 1rem"}}>
         {props.mckey && (
-          <Button variant="contained" color="neutral" onClick={() => {props.drmRefresh()}}>Refresh</Button>
+          <Button variant="contained" color="neutral" onClick={() => {props.drmRefresh(); props.refresh(); props.getPlayInfo(); props.updateContentInfo();}}>Refresh</Button>
         )}
         </Grid>
       </Grid>

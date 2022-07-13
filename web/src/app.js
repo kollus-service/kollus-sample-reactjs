@@ -171,6 +171,7 @@ export default function App() {
       isMobile={isMobile}
       content={contentInfo.play}
       updateContentInfo={updateContentInfo}
+      refresh={refresh}
       drmRefresh={drmRefresh}
     />
   );
