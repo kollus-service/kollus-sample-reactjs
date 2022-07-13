@@ -167,7 +167,7 @@ export default function Template(props) {
           {props.contentsList.data.map((content, index) => {
             return (
               <ListItem
-                key={content}
+                key={index}
                 disablePadding
                 onClick={() => {
                   props.refresh();
