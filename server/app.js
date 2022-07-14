@@ -31,7 +31,7 @@ dotenv.config();
 // 설정 보완 필요
 const io = require("socket.io")(http, {
   cors: {
-    origin: ['http://localhost', 'http://localhost:9080', 'http://ldh.videoclouds.net'],
+    origin: ['http://localhost', 'http://localhost:9080', 'http://react.videoclouds.net'],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -43,7 +43,7 @@ const SOCKET_PORT = process.env.SOCKET_PORT || 9082;
 // api 서버에서 cors 허용
 const cors = require("cors");
 app.use(cors({
-  origin: ['http://localhost', 'http://localhost:9080', 'http://ldh.videoclouds.net'],
+  origin: ['http://localhost', 'http://localhost:9080', 'http://react.videoclouds.net'],
 }));
 
 app.use(express.urlencoded({ extended: true }));
