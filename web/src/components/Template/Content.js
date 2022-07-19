@@ -18,12 +18,28 @@ export default function Content(props) {
       )
       }
 
-      {props.mckey && isMobile && (
+{props.mckey && isMobile && (
         <MobileView>
-          <iframe id="kollus-mobile-player" className="kollus-player" width="100%" height="480" src={props.content} frameBorder="0" allowFullScreen></iframe>
+          <iframe id="kollus-mobile-player" className="kollus-player" width="100%" height="480" src={props.content} onLoad={()=>{
+            let controller = new VgControllerClient({
+              //getElementById 값의 영상이 나올 iframe의 id값을 넣으시면 됩니다. 
+              target_window: document.getElementById('kollus-mobile-player').contentWindow
+            });
+
+            controller.on('ready', function() {
+              localStorage.setItem('player_id',controller.get_player_id())
+            });
+
+            setTimeout(() => {
+              console.log(controller.set_close_button(true, ()=> {
+                alert("set_close_button");
+              }));
+            }, 3000);
+
+            }}frameBorder="0" allowFullScreen></iframe>
         </MobileView>
       )}
-      
+
       {props.mckey && isBrowser && (
         <Box display="flex" justifyContent="center" alignItems="center">
           <iframe id="kollus-player" className="kollus-player" onLoad={()=>{
