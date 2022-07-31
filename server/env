@@ -1,15 +1,15 @@
 # 해당 파일을 .env 로 생성해주세요.
 # 서비스 계정명
-CLIENT_USER_ID=dh.lim
+CLIENT_USER_ID=
 
 # 서비스 키
-SECURITY_KEY=catenoid1
+SECURITY_KEY=
 
 # API 접근 토큰
-ACCESS_TOKEN=sj988xe5eaey13i4
+ACCESS_TOKEN=
 
 # 사용자 키
-CUSTOM_USER_KEY=cd300b44b9150b57c8400bde82c825d34743f587ce2b776a353d9c8f9dc95040
+CUSTOM_USER_KEY=
 
 # 카테고리 키
-CATEGORY_KEY=yrbhtapmwpigp1nd
+CATEGORY_KEY=
