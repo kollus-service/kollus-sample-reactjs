@@ -17,10 +17,10 @@ const logDir = "logs"; // logs 디렉토리 하위에 로그 파일 저장
 const { combine, timestamp, colorize, json } = winston.format;
 
 const db = require("./persistence");
-const getContents = require("./routes/getContents");
-const addContent = require("./routes/addContent");
-const updateContent = require("./routes/updateContent");
-const deleteContent = require("./routes/deleteContent");
+const getContents = require("./persistence/content/getContents");
+const addContent = require("./persistence/content/addContent");
+const updateContent = require("./persistence/content/updateContent");
+const deleteContent = require("./persistence/content/deleteContent");
 
 const constants = require("./lib/constants");
 const jwt = require("./lib/jwt");
