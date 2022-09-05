@@ -15,6 +15,13 @@ const logDir = "logs"; // logs 디렉토리 하위에 로그 파일 저장
 const { combine, timestamp, colorize, json } = winston.format;
 
 const db = require("./persistence");
+<<<<<<< HEAD
+=======
+const getContents = require("./persistence/content/getContents");
+const addContent = require("./persistence/content/addContent");
+const updateContent = require("./persistence/content/updateContent");
+const deleteContent = require("./persistence/content/deleteContent");
+>>>>>>> 964cd0b7563552ced2fdcbbed3260791675fb654
 
 const addRouter = require("./routes/content/add");
 const listRouter = require("./routes/content/list");
