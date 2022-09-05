@@ -81,13 +81,13 @@ const winstonLogFormat = {
 app.use(expressWinston.logger(winstonLogFormat));
 app.use(expressWinston.errorLogger(winstonLogFormat));
 
-app.use("/add", addRouter);
-app.use("/list", listRouter);
-app.use("/update", updateRouter);
-app.use("/delete", deleteRouter);
-app.use("/drm", drmRouter);
-app.use("/play", playRouter);
-app.use("/upload", uploadRouter);
+app.use("/content/add", addRouter);
+app.use("/content/list", listRouter);
+app.use("/content/update", updateRouter);
+app.use("/content/delete", deleteRouter);
+app.use("/content/drm", drmRouter);
+app.use("/content/play", playRouter);
+app.use("/content/upload", uploadRouter);
 
 let lmsCallbackSleep = 0;
 app.get("/config/lms-callback/sleep/:count", async (req, res, next) => {

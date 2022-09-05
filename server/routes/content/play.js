@@ -4,7 +4,7 @@ const router = express.Router();
 const constants = require("../../lib/constants");
 const jwt = require("../../lib/jwt");
 
-router.get("/content/play", (req, res, next) => {
+router.get("/", (req, res, next) => {
   let payload = {
     mc: [
       {

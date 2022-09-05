@@ -4,7 +4,7 @@ const axios = require("axios");
 const constants = require("../../lib/constants");
 const FormData = require("form-data");
 
-router.get("/content/upload/url", async (req, res, next) => {
+router.get("/url", async (req, res, next) => {
   let formData = new FormData();
   // is_encryption_upload : 0은 일반 업로드, 1은 암호화 업로드
   formData.append("is_encryption_upload", 1);
