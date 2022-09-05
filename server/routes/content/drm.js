@@ -35,7 +35,7 @@ router.post("/callback", (req, res, next) => {
       };
       break;
 
-    // Downloading
+    // Download Done
     case 2 :
       break;
 
