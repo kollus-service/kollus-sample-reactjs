@@ -82,8 +82,8 @@ router.get("/refresh", (req, res, next) => {
     message:"DRM refreshed!",
     old: oldExpireTime,
     new: expireTime,
-    contentExpired : contentExpired,
-    contentExpiredReset : contentExpiredReset,
+    content_expired : contentExpired,
+    content_expire_reset : contentExpiredReset,
   });
 });
 
