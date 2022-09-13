@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const dotenv = require("dotenv");
-const jwt = require('jsonwebtoken');
+const jwt = require("../../lib/jwt");
 const constants = require("../../lib/constants");
 
 let expireTime = Math.round(new Date().getTime() / 1000) + constants.EXPIRE_TIME;
