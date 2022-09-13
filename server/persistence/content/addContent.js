@@ -1,4 +1,4 @@
-const db = require('../persistence');
+const db = require('..');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = async (req, res, next) => {
